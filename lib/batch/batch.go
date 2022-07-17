@@ -16,13 +16,16 @@ func getOne(id int64) user {
 
 func getBatch(n int64, pool int64) (res []user) {
 	var wg sync.WaitGroup
+	var m sync.Mutex
 	var i int64 = 0
 	for i = 0; i < n; i++ {
 		wg.Add(1)
 		go func(id int64) {
 			defer wg.Done()
 			u := getOne(id)
+			m.Lock()
 			res = append(res, u)
+			m.Unlock()
 		}(i)
 	}
 	wg.Wait()
