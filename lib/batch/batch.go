@@ -1,6 +1,7 @@
 package batch
 
 import (
+	"sync"
 	"time"
 )
 
@@ -14,5 +15,16 @@ func getOne(id int64) user {
 }
 
 func getBatch(n int64, pool int64) (res []user) {
-	return nil
+	var wg sync.WaitGroup
+	var i int64 = 0
+	for i = 0; i < n; i++ {
+		wg.Add(1)
+		go func(id int64) {
+			defer wg.Done()
+			u := getOne(id)
+			res = append(res, u)
+		}(i)
+	}
+	wg.Wait()
+	return res
 }
